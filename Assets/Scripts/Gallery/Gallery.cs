@@ -18,18 +18,29 @@ public class Gallery : MonoBehaviour, IPointerMoveHandler
     int start_count_image;
     int current_image_count;
     bool busy;
+    string current_url;
 
-    private void Start()
+    private void OnLevelWasLoaded(int level)
     {
-        uri_names = Resources.get_file_mames(Folder_gallery.current_uri);
-        max_image = uri_names.Count;
-        contentGridLayout = content.GetComponent<GridLayoutGroup>();
-        transform.GetComponent<RectTransform>().sizeDelta = new Vector2(Screen.width, Screen.height);
-        size_image = (Screen.width - contentGridLayout.padding.left - contentGridLayout.padding.right - contentGridLayout.spacing.x) / 2;
-        start_count_image = (Screen.height - contentGridLayout.padding.top - contentGridLayout.padding.bottom) / (int)(size_image + contentGridLayout.spacing.y) * 2 + 2;
-        contentGridLayout.cellSize = new Vector2(size_image, size_image);
-        add_image(start_count_image);
-        start_up();
+        bool check = false;
+
+        if (current_url == null) check = true;
+        else if(!current_url.Equals(Folder_gallery.current_uri)) check = true;
+
+        if (check)
+        {
+            delete_children();
+            current_url = Folder_gallery.current_uri;
+            uri_names = Resources.get_file_mames(current_url);
+            max_image = uri_names.Count;
+            contentGridLayout = content.GetComponent<GridLayoutGroup>();
+            transform.GetComponent<RectTransform>().sizeDelta = new Vector2(Screen.width, Screen.height);
+            size_image = (Screen.width - contentGridLayout.padding.left - contentGridLayout.padding.right - contentGridLayout.spacing.x) / 2;
+            start_count_image = (Screen.height - contentGridLayout.padding.top - contentGridLayout.padding.bottom) / (int)(size_image + contentGridLayout.spacing.y) * 2 + 2;
+            contentGridLayout.cellSize = new Vector2(size_image, size_image);
+            add_image(start_count_image);
+            start_up();
+        }
     }
 
     void add_image(int count)
@@ -121,5 +132,13 @@ public class Gallery : MonoBehaviour, IPointerMoveHandler
     void start_up()
     {
         StartCoroutine(up());
+    }
+
+    void delete_children()
+    {
+        foreach (Transform child in content)
+        {
+            Destroy(child.gameObject);
+        }
     }
 }
